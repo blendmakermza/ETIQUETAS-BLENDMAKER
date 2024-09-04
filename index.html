@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Etiquetas de Vino</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="style.css">
+    <script src="scripts.js" defer></script>
+</head>
+<body>
+    <!-- Tu HTML aquí -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+    <div class="container">
+        <!-- Paso de Bienvenida -->
+        <div id="welcome" class="step active">
+            <h1>BlendMaker</h1>
+            <p>Te invitamos a diseñar tu etiqueta</p>
+            <button id="startButton">Comenzar</button>
+        </div>
+
+        <!-- Paso 1: Agregar Texto Principal -->
+        <div id="step1" class="step">
+            <h2>Agregar Texto Principal</h2>
+            <input type="text" id="mainText" placeholder="Texto Principal">
+            <input type="color" id="mainTextColor" value="#000000">
+            <input type="number" id="mainTextSize" value="24">
+            <select id="mainTextFont">
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <select id="mainTextAlign">
+                <option value="left">Izquierda</option>
+                <option value="center">Centrado</option>
+                <option value="right">Derecha</option>
+            </select>
+            <button class="next-button">Siguiente</button>
+            <button class="prev-button">Anterior</button>
+        </div>
+
+        <!-- Paso 2: Agregar Texto Adicional -->
+        <div id="step2" class="step">
+            <h2>Agregar Texto Adicional</h2>
+            <input type="text" id="additionalText" placeholder="Texto Adicional">
+            <input type="color" id="additionalTextColor" value="#000000">
+            <input type="number" id="additionalTextSize" value="18">
+            <select id="additionalTextFont">
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            <select id="additionalTextAlign">
+                <option value="left">Izquierda</option>
+                <option value="center">Centrado</option>
+                <option value="right">Derecha</option>
+            </select>
+            <button class="next-button">Siguiente</button>
+            <button class="prev-button">Anterior</button>
+        </div>
+
+        <!-- Paso 3: Seleccionar Borde o Cenefas -->
+        <div id="step3" class="step">
+            <h2>Seleccionar Borde o Cenefas</h2>
+            <div class="border-picker-container">
+                <div class="border-option" data-border="mod 1.png" id="border1" style="background-image: url('mod 1.png');"></div>
+                <div class="border-option" data-border="mod 2.png" id="border2" style="background-image: url('mod 2.png');"></div>
+                <div class="border-option" data-border="mod 3.png" id="border3" style="background-image: url('mod 3.png');"></div>
+                <div class="border-option" data-border="mod 4.png" id="border4" style="background-image: url('mod 4.png');"></div>
+                <div class="border-option" data-border="mod 5.png" id="border5" style="background-image: url('mod 5.png');"></div>
+                <div class="border-option" data-border="mod 6.png" id="border6" style="background-image: url('mod 6.png');"></div>
+                <!-- Más bordes si se desean agregar -->
+            </div>
+            <button class="next-button">Siguiente</button>
+            <button class="prev-button">Anterior</button>
+        </div>
+
+        <!-- Paso 4: Seleccionar Marco -->
+        <div id="step4" class="step">
+            <h2>Seleccionar Marco</h2>
+            <div class="frame-picker-container">
+                <div class="frame-option" data-frame="frame1.png" id="frame1" style="background-image: url('frame1.png');"></div>
+                <div class="frame-option" data-frame="frame2.png" id="frame2" style="background-image: url('frame2.png');"></div>
+                <div class="frame-option" data-frame="frame3.png" id="frame3" style="background-image: url('frame3.png');"></div>
+                <!-- Más marcos si se desean agregar -->
+            </div>
+            <button class="next-button">Siguiente</button>
+            <button class="prev-button">Anterior</button>
+        </div>
+
+        <!-- Paso 5: Vista Previa y Exportar -->
+        <div id="step5" class="step">
+            <h2>Vista Previa y Exportar</h2>
+            <div id="labelPreview">
+                <div id="label">
+                    <div id="labelText"></div>
+                    <div id="labelAdditionalText"></div>
+                    <div id="labelBorder"></div>
+                    <div id="labelFrame"></div>
+                </div>
+                <div class="center-line"></div>
+                <div class="vertical-line"></div>
+            </div>
+            <button id="download-button">Exportar</button>
+            <button class="prev-button">Anterior</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registrado con éxito:', registration);
+                    })
+                    .catch(function(error) {
+                        console.error('Error al registrar el ServiceWorker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

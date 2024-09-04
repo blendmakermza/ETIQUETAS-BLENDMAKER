@@ -1,0 +1,145 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 350px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #ff6b6b;
+}
+
+.step {
+    display: none;
+}
+
+.step.active {
+    display: block;
+}
+
+input[type="text"], input[type="color"], input[type="number"], select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+}
+
+button {
+    display: block;
+    margin: 0 auto;
+    padding: 10px 20px;
+    background-color: #ff6b6b;
+    color: #fff;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    margin-top: 20px;
+}
+
+button:hover {
+    background-color: #ee5253;
+}
+
+/* Vista previa de la etiqueta */
+#labelPreview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    position: relative;
+}
+
+#label {
+    position: relative;
+    width: 300px; /* 10 cm en píxeles (aproximadamente) */
+    height: 450px; /* 15 cm en píxeles (aproximadamente) */
+    border: 1px solid #ccc; /* Opcional: para visualizar el contorno del lienzo */
+    overflow: hidden; /* Oculta cualquier contenido que se desborde */
+}
+
+
+/* Bordes y marcos */
+#labelBorder, #labelFrame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Textos */
+#labelText, #labelAdditionalText {
+    position: absolute;
+    font-family: Arial, sans-serif;
+    cursor: move;
+    user-select: none;
+    z-index: 10; /* Asegura que el texto esté por encima del borde y marco */
+}
+
+/* Opciones de bordes y marcos */
+.frame-picker-container, .border-picker-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.frame-option {
+    width: 300px; /* Tamaño fijo en píxeles */
+    height: 450px; /* Tamaño fijo en píxeles */
+    background-size: contain; /* Ajusta el tamaño de la imagen al contenedor */
+    background-position: center; /* Centra la imagen en el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+}
+
+.border-option {
+    width: 300px; /* Tamaño fijo en píxeles */
+    height: 450px; /* Tamaño fijo en píxeles */
+    background-size: contain; /* Ajusta el tamaño de la imagen al contenedor */
+    background-position: center; /* Centra la imagen en el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+}
+
+/* Líneas de referencia */
+.center-line, .vertical-line {
+    position: absolute;
+    background-color: rgba(255, 0, 0, 0.5);
+    z-index: 3;
+}
+
+.center-line {
+    width: 100%;
+    height: 1px;
+    top: 50%;
+    left: 0;
+}
+
+.vertical-line {
+    width: 1px;
+    height: 100%;
+    top: 0;
+    left: 50%;
+}
+
+.hide-during-export {
+    display: none;
+}
