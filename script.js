@@ -1,189 +1,368 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const steps = document.querySelectorAll('.step');
-    const nextButtons = document.querySelectorAll('.next-button');
-    const prevButtons = document.querySelectorAll('.prev-button');
-    const startButton = document.getElementById('startButton'); // Botón "Comenzar"
-    let currentStep = 0;
+// script.js
 
-    function showStep(index) {
-        steps.forEach((step, i) => {
-            step.classList.toggle('active', i === index);
-        });
-    }
+// Variables globales
+let isDragging = false;//
+let selectedText = null;
+let offsetX, offsetY;
 
-    function goToNextStep() {
-        if (currentStep < steps.length - 1) {
-            currentStep++;
-            showStep(currentStep);
-        }
-    }
+let backgroundImage = null;
+let borderImage = null;
 
-    function goToPreviousStep() {
-        if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-        }
-    }
+const canvas = document.getElementById("canvas");
+canvas.width = 3000; // Anchura en alta resolución
+canvas.height = 4500; // Altura en alta resolución
 
-    nextButtons.forEach(button => {
-        button.addEventListener('click', goToNextStep);
-    });
+const context = canvas.getContext("2d");
 
-    prevButtons.forEach(button => {
-        button.addEventListener('click', goToPreviousStep);
-    });
+// Propiedades del título
+let titleText = {
+  content: "",
+  color: "#000000",
+  size: 20,
+  fontFamily: "Arial, sans-serif",
+  textAlign: "center",
+  x: canvas.width / 2, // Centrado horizontalmente
+  y: 500,
+};
 
-    if (startButton) {
-        startButton.addEventListener('click', goToNextStep);
-    }
+// Propiedades de la descripción 1
+let description1Text = {
+  content: "",
+  color: "#000000",
+  size: 16,
+  fontFamily: "Arial, sans-serif",
+  textAlign: "center",
+  x: canvas.width / 2,
+  y: 1000,
+};
 
-   // Agregar interacción para bordes
-const borderOptions = document.querySelectorAll('.border-option');
-const labelBorder = document.getElementById('labelBorder');
+// Propiedades de la descripción 2
+let description2Text = {
+  content: "",
+  color: "#000000",
+  size: 16,
+  fontFamily: "Arial, sans-serif",
+  textAlign: "center",
+  x: canvas.width / 2,
+  y: 1500,
+};
 
-borderOptions.forEach(option => {
-    option.addEventListener('click', function () {
-        const borderUrl = this.getAttribute('data-border');
-        labelBorder.style.backgroundImage = `url('${borderUrl}')`;
-        labelBorder.style.backgroundSize = 'cover'; // Ajusta el tamaño de la imagen al contenedor
-        labelBorder.style.backgroundPosition = 'center'; // Centra la imagen
-        labelBorder.style.backgroundRepeat = 'no-repeat'; // Evita que la imagen se repita
-        borderOptions.forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-    });
+// Variables para los inputs
+const titleInput = document.getElementById("titleInput");
+const titleColorInput = document.getElementById("titleColorInput");
+const titleSizeInput = document.getElementById("titleSizeInput");
+const titleFont = document.getElementById("titleFont");
+const mainTextAlign = document.getElementById("mainTextAlign");
+
+const descriptionInput1 = document.getElementById("descriptionInput1");
+const description1ColorInput = document.getElementById("description1ColorInput");
+const description1SizeInput = document.getElementById("description1SizeInput");
+const description1Font = document.getElementById("description1Font");
+const description1TextAlign = document.getElementById("description1TextAlign");
+
+const descriptionInput2 = document.getElementById("descriptionInput2");
+const description2ColorInput = document.getElementById("description2ColorInput");
+const description2SizeInput = document.getElementById("description2SizeInput");
+const description2Font = document.getElementById("description2Font");
+const description2TextAlign = document.getElementById("description2TextAlign");
+
+// Variables para las opciones de imagen de fondo y borde (Página 4 y Página 5)
+const frameOptions = document.querySelectorAll(".frame-option");
+const borderOptions = document.querySelectorAll(".border-option");
+
+// Función para mostrar una página y ocultar las demás
+function showPage(pageId) {
+  const pages = document.querySelectorAll(".page");
+  pages.forEach((page) => (page.style.display = "none"));
+  document.getElementById(pageId).style.display = "block";
+}
+
+// Inicializamos en la página 1
+showPage("page1");
+
+// Navegación entre páginas
+document.getElementById("next1").addEventListener("click", () => showPage("page2"));
+document.getElementById("next2").addEventListener("click", () => showPage("page3"));
+document.getElementById("next3").addEventListener("click", () => showPage("page4"));
+document.getElementById("next4").addEventListener("click", () => showPage("page5"));
+document.getElementById("next5").addEventListener("click", () => showPage("page6"));
+
+document.getElementById("prev2").addEventListener("click", () => showPage("page1"));
+document.getElementById("prev3").addEventListener("click", () => showPage("page2"));
+document.getElementById("prev4").addEventListener("click", () => showPage("page3"));
+document.getElementById("prev5").addEventListener("click", () => showPage("page4"));
+document.getElementById("prev6").addEventListener("click", () => showPage("page5"));
+
+// Selección de imagen de fondo (Página 4)
+frameOptions.forEach((option) => {
+  option.addEventListener("click", function () {
+    // Indicar cuál fue seleccionado visualmente (opcional)
+    frameOptions.forEach((opt) => opt.classList.remove("selected"));
+    this.classList.add("selected");
+
+    const frameUrl = this.getAttribute("data-frame");
+    backgroundImage = new Image();
+    backgroundImage.src = frameUrl;
+
+    backgroundImage.onload = function () {
+      redrawCanvas();
+    };
+  });
 });
 
-// Agregar interacción para marcos
-const frameOptions = document.querySelectorAll('.frame-option');
-const labelFrame = document.getElementById('labelFrame');
+// Agregar interacción para bordes (Página 5)
+borderOptions.forEach((option) => {
+  option.addEventListener("click", function () {
+    // Indicar cuál fue seleccionado visualmente (opcional)
+    borderOptions.forEach((opt) => opt.classList.remove("selected"));
+    this.classList.add("selected");
 
-frameOptions.forEach(option => {
-    option.addEventListener('click', function () {
-        const frameUrl = this.getAttribute('data-frame');
-        labelFrame.style.backgroundImage = `url('${frameUrl}')`;
-        labelFrame.style.backgroundSize = 'cover'; // Ajusta el tamaño de la imagen al contenedor
-        labelFrame.style.backgroundPosition = 'center'; // Centra la imagen
-        labelFrame.style.backgroundRepeat = 'no-repeat'; // Evita que la imagen se repita
-        frameOptions.forEach(opt => opt.classList.remove('selected'));
-        this.classList.add('selected');
-    });
+    const borderUrl = this.getAttribute("data-border");
+    borderImage = new Image();
+    borderImage.src = borderUrl;
+
+    borderImage.onload = function () {
+      redrawCanvas();
+    };
+  });
 });
 
+// Actualización en tiempo real de la vista previa
 
-    // Configurar la posición y el estilo del texto principal
-    const mainTextInput = document.getElementById('mainText');
-    const mainTextColor = document.getElementById('mainTextColor');
-    const mainTextSize = document.getElementById('mainTextSize');
-    const mainTextFont = document.getElementById('mainTextFont');
-    const mainTextAlign = document.getElementById('mainTextAlign');
-    const labelText = document.getElementById('labelText');
-
-    mainTextInput.addEventListener('input', function () {
-        labelText.textContent = this.value;
-    });
-
-    mainTextColor.addEventListener('input', function () {
-        labelText.style.color = this.value;
-    });
-
-    mainTextSize.addEventListener('input', function () {
-        labelText.style.fontSize = `${this.value}px`;
-    });
-
-    mainTextFont.addEventListener('change', function () {
-        labelText.style.fontFamily = this.value;
-    });
-
-    mainTextAlign.addEventListener('change', function () {
-        labelText.style.textAlign = this.value;
-    });
-
-    // Configurar la posición y el estilo del texto adicional
-    const additionalTextInput = document.getElementById('additionalText');
-    const additionalTextColor = document.getElementById('additionalTextColor');
-    const additionalTextSize = document.getElementById('additionalTextSize');
-    const additionalTextFont = document.getElementById('additionalTextFont');
-    const additionalTextAlign = document.getElementById('additionalTextAlign');
-    const labelAdditionalText = document.getElementById('labelAdditionalText');
-
-    additionalTextInput.addEventListener('input', function () {
-        labelAdditionalText.textContent = this.value;
-    });
-
-    additionalTextColor.addEventListener('input', function () {
-        labelAdditionalText.style.color = this.value;
-    });
-
-    additionalTextSize.addEventListener('input', function () {
-        labelAdditionalText.style.fontSize = `${this.value}px`;
-    });
-
-    additionalTextFont.addEventListener('change', function () {
-        labelAdditionalText.style.fontFamily = this.value;
-    });
-
-    additionalTextAlign.addEventListener('change', function () {
-        labelAdditionalText.style.textAlign = this.value;
-    });
-
-    // Inicializar en el primer paso (la pantalla de bienvenida)
-    showStep(currentStep);
-
-    // Hacer que el texto sea arrastrable
-    interact('#labelText, #labelAdditionalText')
-        .draggable({
-            listeners: {
-                start (event) {
-                    // Opcional: puedes agregar código para cuando comienza el arrastre
-                },
-                move (event) {
-                    const target = event.target;
-                    // Mantener la posición inicial del texto en relación con el contenedor
-                    const x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-                    const y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-                    target.style.transform = `translate(${x}px, ${y}px)`;
-
-                    target.setAttribute('data-x', x);
-                    target.setAttribute('data-y', y);
-                },
-                end (event) {
-                    // Opcional: puedes agregar código para cuando termina el arrastre
-                }
-            },
-            modifiers: [
-                interact.modifiers.restrictRect({
-                    restriction: 'parent',
-                    endOnly: true
-                })
-            ],
-            inertia: true
-        });
-});
-// Exportar la imagen
-document.getElementById('download-button').addEventListener('click', function() {
-    console.log('Botón de exportar clickeado');  // Mensaje de depuración
-
-    // Ocultar las líneas de referencia
-    document.querySelector('.center-line').classList.add('hide-during-export');
-    document.querySelector('.vertical-line').classList.add('hide-during-export');
-
-    // Usar html2canvas para tomar una captura del elemento
-    html2canvas(document.getElementById('label'), { scale: 3 }).then(canvas => {
-        console.log('Captura realizada con éxito');  // Mensaje de depuración
-        const link = document.createElement('a');
-        link.download = 'etiqueta.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-
-        // Mostrar las líneas de referencia nuevamente
-        document.querySelector('.center-line').classList.remove('hide-during-export');
-        document.querySelector('.vertical-line').classList.remove('hide-during-export');
-    }).catch(error => {
-        console.error('Error al exportar la imagen:', error);  // Mensaje de error
-        // Mostrar las líneas de referencia nuevamente en caso de error
-        document.querySelector('.center-line').classList.remove('hide-during-export');
-        document.querySelector('.vertical-line').classList.remove('hide-during-export');
-    });
+// Título
+titleInput.addEventListener("input", function () {
+  titleText.content = titleInput.value;
+  redrawCanvas();
 });
 
+titleColorInput.addEventListener("input", function () {
+  titleText.color = titleColorInput.value;
+  redrawCanvas();
+});
+
+titleSizeInput.addEventListener("input", function () {
+  titleText.size = parseInt(titleSizeInput.value);
+  redrawCanvas();
+});
+
+titleFont.addEventListener("change", function () {
+  titleText.fontFamily = titleFont.value;
+  redrawCanvas();
+});
+
+mainTextAlign.addEventListener("change", function () {
+  titleText.textAlign = mainTextAlign.value;
+  redrawCanvas();
+});
+
+// Descripción 1
+descriptionInput1.addEventListener("input", function () {
+  description1Text.content = descriptionInput1.value;
+  redrawCanvas();
+});
+
+description1ColorInput.addEventListener("input", function () {
+  description1Text.color = description1ColorInput.value;
+  redrawCanvas();
+});
+
+description1SizeInput.addEventListener("input", function () {
+  description1Text.size = parseInt(description1SizeInput.value);
+  redrawCanvas();
+});
+
+description1Font.addEventListener("change", function () {
+  description1Text.fontFamily = description1Font.value;
+  redrawCanvas();
+});
+
+description1TextAlign.addEventListener("change", function () {
+  description1Text.textAlign = description1TextAlign.value;
+  redrawCanvas();
+});
+
+// Descripción 2
+descriptionInput2.addEventListener("input", function () {
+  description2Text.content = descriptionInput2.value;
+  redrawCanvas();
+});
+
+description2ColorInput.addEventListener("input", function () {
+  description2Text.color = description2ColorInput.value;
+  redrawCanvas();
+});
+
+description2SizeInput.addEventListener("input", function () {
+  description2Text.size = parseInt(description2SizeInput.value);
+  redrawCanvas();
+});
+
+description2Font.addEventListener("change", function () {
+  description2Text.fontFamily = description2Font.value;
+  redrawCanvas();
+});
+
+description2TextAlign.addEventListener("change", function () {
+  description2Text.textAlign = description2TextAlign.value;
+  redrawCanvas();
+});
+
+// Función para redibujar el canvas
+function redrawCanvas() {
+  // Limpiar el canvas
+  context.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Dibujar la imagen de fondo si está cargada
+  if (backgroundImage && backgroundImage.complete) {
+    context.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+  }
+
+  // Dibujar los textos
+  drawTexts();
+
+  // Dibujar la imagen del marco si está cargada
+  if (borderImage && borderImage.complete) {
+    context.drawImage(borderImage, 0, 0, canvas.width, canvas.height);
+  }
+}
+
+// Función para dibujar los textos
+function drawTexts() {
+  const fontSizeMultiplier = canvas.width / 300; // Ajuste dinámico
+  context.textBaseline = "top";
+
+  // Dibujar título
+  if (titleText.content.trim() !== "") {
+    context.font = `${titleText.size * fontSizeMultiplier}px ${titleText.fontFamily}`;
+    context.fillStyle = titleText.color;
+    context.textAlign = titleText.textAlign;
+
+    // Ajustar posición según alineación
+    let x = titleText.x;
+    if (titleText.textAlign === "center") {
+      x = titleText.x;
+    } else if (titleText.textAlign === "left") {
+      x = 0;
+    } else if (titleText.textAlign === "right") {
+      x = canvas.width;
+    }
+
+    context.fillText(titleText.content, x, titleText.y);
+  }
+
+  // Dibujar descripción 1
+  if (description1Text.content.trim() !== "") {
+    context.font = `${description1Text.size * fontSizeMultiplier}px ${description1Text.fontFamily}`;
+    context.fillStyle = description1Text.color;
+    context.textAlign = description1Text.textAlign;
+    drawMultilineText(description1Text);
+  }
+
+  // Dibujar descripción 2
+  if (description2Text.content.trim() !== "") {
+    context.font = `${description2Text.size * fontSizeMultiplier}px ${description2Text.fontFamily}`;
+    context.fillStyle = description2Text.color;
+    context.textAlign = description2Text.textAlign;
+    drawMultilineText(description2Text);
+  }
+}
+
+// Función para dibujar texto multilínea
+function drawMultilineText(textObj) {
+  const lines = textObj.content.split('\n');
+  const lineHeight = textObj.size * (canvas.width / 300) * 1.2;
+  let x = textObj.x;
+
+  if (textObj.textAlign === "center") {
+    x = textObj.x;
+  } else if (textObj.textAlign === "left") {
+    x = 0;
+  } else if (textObj.textAlign === "right") {
+    x = canvas.width;
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    context.fillText(lines[i], x, textObj.y + i * lineHeight);
+  }
+}
+
+// Funcionalidad de arrastrar y soltar
+canvas.addEventListener("mousedown", function (e) {
+  const mousePos = getMousePos(canvas, e);
+  if (isMouseOverText(mousePos, titleText)) {
+    selectedText = titleText;
+  } else if (isMouseOverText(mousePos, description1Text)) {
+    selectedText = description1Text;
+  } else if (isMouseOverText(mousePos, description2Text)) {
+    selectedText = description2Text;
+  }
+
+  if (selectedText) {
+    isDragging = true;
+    offsetX = mousePos.x - selectedText.x;
+    offsetY = mousePos.y - selectedText.y;
+  }
+});
+
+canvas.addEventListener("mousemove", function (e) {
+  if (isDragging && selectedText) {
+    const mousePos = getMousePos(canvas, e);
+    selectedText.x = mousePos.x - offsetX;
+    selectedText.y = mousePos.y - offsetY;
+    redrawCanvas();
+  }
+});
+
+canvas.addEventListener("mouseup", function () {
+  isDragging = false;
+  selectedText = null;
+});
+
+canvas.addEventListener("mouseout", function () {
+  isDragging = false;
+  selectedText = null;
+});
+
+function getMousePos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: ((evt.clientX - rect.left) / rect.width) * canvas.width,
+    y: ((evt.clientY - rect.top) / rect.height) * canvas.height,
+  };
+}
+
+function isMouseOverText(mousePos, textObj) {
+  context.font = `${textObj.size * (canvas.width / 300)}px ${textObj.fontFamily}`;
+  const lines = textObj.content.split('\n');
+  const lineHeight = textObj.size * (canvas.width / 300) * 1.2; // Factor de línea
+  const textWidth = Math.max(...lines.map((line) => context.measureText(line).width));
+  const textHeight = lines.length * lineHeight;
+
+  let textX = textObj.x;
+  let textY = textObj.y;
+
+  // Ajuste de posición según la alineación
+  if (textObj.textAlign === "center") {
+    textX -= textWidth / 2;
+  } else if (textObj.textAlign === "right") {
+    textX -= textWidth;
+  }
+
+  return (
+    mousePos.x >= textX &&
+    mousePos.x <= textX + textWidth &&
+    mousePos.y >= textY &&
+    mousePos.y <= textY + textHeight
+  );
+}
+
+// Función para exportar la imagen
+document.getElementById("exportBtn").addEventListener("click", function () {
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png", 1.0);
+  link.download = "vista-previa.png";
+  link.click();
+});
+
+// Llamada inicial para dibujar el canvas
+redrawCanvas();
